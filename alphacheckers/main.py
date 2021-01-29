@@ -38,7 +38,7 @@ def self_play(player1, player2, iteration, memory=None, log_result=False, save_m
         player1.compile_model()
     result = run_matches(player1, player2, config.EPISODES, memory=memory, iteration=iteration)
     if save_model:
-        player1.model.model.save(config.MODELS_DIR + 'model-{}'.format(iteration))
+        player1.model.model.save(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
     if log_result:
         print(result)
     if memory is not None:
