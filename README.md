@@ -20,6 +20,6 @@ python -m alphacheckers
 
 ### Credits
 These resources were helpful for guidance.
-[Article on Connect 4 implementation](https://adsp.ai/blog/how-to-build-your-own-alphazero-ai-using-python-and-keras/)
-[Github link for above article](https://github.com/AppliedDataSciencePartners/DeepReinforcementLearning/)
-[Article on detailing lessons from Connect 4 implementation](https://medium.com/oracledevs/lessons-from-implementing-alphazero-7e36e9054191)
+- [Article on Connect 4 implementation](https://adsp.ai/blog/how-to-build-your-own-alphazero-ai-using-python-and-keras/)
+- [Github link for above article](https://github.com/AppliedDataSciencePartners/DeepReinforcementLearning/)
+- [Article on detailing lessons from Connect 4 implementation](https://medium.com/oracledevs/lessons-from-implementing-alphazero-7e36e9054191)
