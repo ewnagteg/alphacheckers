@@ -109,7 +109,7 @@ class Res_CNN():
         # HWC - cpu doesn't support CHW
         main_input = tf.keras.layers.Input(shape = (8,8,4), name = 'main_input')
         x = self.conv_layer(main_input, 128, (3,3))
-        for h in range(10):
+        for h in range(config.HIDDEN_LAYERS):
             x = self.residual_layer(x, 128, (3,3))
 
         vh = self.value_head(x)
