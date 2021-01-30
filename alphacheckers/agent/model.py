@@ -149,7 +149,7 @@ class Res_CNN():
                     index = self._map[index]
                 if (tn&check) != 0:
                     if (tn & state[idx]) == tn:
-                        board[0, x, y, index] = 1 if index == 0 or index == 1 else -1
+                        board[0, x, y, index] = 1
         return board
     
     def load_model(self, path):

@@ -86,7 +86,7 @@ class Agent(object):
         probs = probs[valid]
         mlist = game.get_moves(*node.state)
         if len(mlist) == 0:
-            return value
+            return value[0]
         for idx, move_index in enumerate(valid):
             action = game.hard_index_to_move(move_index, mlist, node.state[4])
             new_state = game.run_move(*node.state, action)
@@ -139,15 +139,12 @@ class Agent(object):
 
         # needs to consider reflections for player = -1
         # choose action without tau
-        # action_id = np.random.multinomial(1, pi)
-        # action_idx = np.where(action_id==1)[0][0]
         act = game.index_to_move(action_idx, self.root.state[4])
         for i, edge in enumerate(self.root.edges):
             if (edge.move&0x3FF) == act:
                 return pi, values[action_idx], action_idx, edge.move
         game.render(*self.root.state)
         game.pretty_print_move(act)
-        # save state
         raise Exception("could not find move")
 
     def run(self, state, tau=0.5):
@@ -166,7 +163,7 @@ class Agent(object):
         loops = round((len(ltmemory) / config.BATCH_SIZE) * config.TRAINIG_CONSANT)
 
         # log memory for debugging
-        log = open("./drive/MyDrive/ltmemory_dump_{}.pkl".format(iteration), "wb")
+        log = open(config.MODELS_DIR + "ltmemory_dump_{}.pkl".format(iteration), "wb")
         pickle.dump(ltmemory, log)
         log.close()
         print('saved ltmemory')

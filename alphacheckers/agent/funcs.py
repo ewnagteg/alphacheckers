@@ -1,5 +1,6 @@
 import alphacheckers.game.game as game
 from alphacheckers.agent.memory import Memory
+import alphacheckers.config.config as config
 
 def run_matches(player1, player2, EPISOPES, memory: Memory = None, iteration=0, log_games = False):
     done = 0
@@ -29,7 +30,7 @@ def run_matches(player1, player2, EPISOPES, memory: Memory = None, iteration=0, 
             if log_games:
                 game.render(*state)
             turn += 1
-            if turn > 30:
+            if turn > config.TAU:
                 tau = 0
             pi, value, idx, action = players[state[4]].run(state, tau)
             if memory != None:
@@ -39,7 +40,7 @@ def run_matches(player1, player2, EPISOPES, memory: Memory = None, iteration=0, 
             # check if game done
             if len(game.get_moves(*state)) == 0 or turn > 80:
                 done = 1
-                winner = int(game.winner(*state))
+                winner = game.winner(*state)
                 if winner == 0:
                     scores['draws'] = scores['draws'] + 1
                 elif winner == 1:

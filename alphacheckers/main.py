@@ -21,7 +21,7 @@ class RandomAgent:
     def set_state(self, state):
         return
 
-def self_play(player1, player2, iteration, memory=None, log_result=False, save_model=False):
+def self_play(player1, player2, iteration, memory=None, log_result=False, save_model=False, episodes=config.EPISODES):
     """
     Parameters:
     player1: Agent used for self play and training
@@ -36,7 +36,7 @@ def self_play(player1, player2, iteration, memory=None, log_result=False, save_m
         print('loading model...')
         player1.load_model(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
         player1.compile_model()
-    result = run_matches(player1, player2, config.EPISODES, memory=memory, iteration=iteration)
+    result = run_matches(player1, player2, episodes, memory=memory, iteration=iteration)
     if save_model:
         player1.model.model.save(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
     if log_result:

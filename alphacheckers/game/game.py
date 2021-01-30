@@ -395,12 +395,6 @@ def winner(p1, p1k, p2, p2k, player):
     """
     if len(get_moves(p1, p1k, p2, p2k, player)) == 0:
         return player * -1
-    np1 = count_peices(p1|p1k)
-    np2 = count_peices(p2|p2k)
-    if np1 == np2:
-        return 0
-    else:
-        return 1 if np1 > np2 else -1
     return 0
 
 
