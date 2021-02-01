@@ -1,4 +1,4 @@
-ALPHA = 10/2.8 # scale for dirichlet noise, paper used 10 / branching factor
+ALPHA = 0.8 # scale for dirichlet noise, paper used 10 / branching factor
 			   # see https://en.wikipedia.org/wiki/Game_complexity
 
 TAU = 30 # number of turns at which tau == 1, after which it is set to zero
@@ -24,4 +24,4 @@ TRAINIG_CONSANT = 1
 
 # Directory containing models
 # Where tf saves the training models
-MODELS_DIR = './drive/MyDrive/'
+MODELS_DIR = '/content/drive/MyDrive/'
