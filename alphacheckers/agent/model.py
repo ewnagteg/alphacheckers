@@ -5,11 +5,12 @@ import alphacheckers.game.game as game
 
 
 class Res_CNN():
-    def __init__(self, reg_const=config.REG_CONST, learning_rate=config.LEARNING_RATE, input_dim=(1,8,8,4), hidden_layers=[5]):
+    def __init__(self, reg_const=config.REG_CONST, learning_rate=config.LEARNING_RATE, input_dim=(1,4,8,8)):
         self.reg_const = reg_const
         self.learning_rate = learning_rate
         self.output_dim = 32*8
         self.model = self.build()
+        self.input_dim = input_dim
         self._map = {
             0: 2,
             1: 3,
@@ -25,13 +26,14 @@ class Res_CNN():
         filters = filters
         , kernel_size = kernel_size
         , padding = 'same'
+        , data_format="channels_first"
         , use_bias=False
         , activation='linear'
         , kernel_regularizer = tf.keras.regularizers.l2(self.reg_const)
         
         )(x)
 
-        x = tf.keras.layers.BatchNormalization(axis=3)(x)
+        x = tf.keras.layers.BatchNormalization(axis=1)(x)
 
         x = tf.keras.layers.add([input_block, x])
 
@@ -45,13 +47,14 @@ class Res_CNN():
         filters = filters
         , kernel_size = kernel_size
         , padding = 'same'
+        , data_format="channels_first"
         , use_bias=False
         , activation='linear'
         , kernel_regularizer = tf.keras.regularizers.l2(self.reg_const)
         
         )(x)
 
-        x = tf.keras.layers.BatchNormalization(axis=3)(x)
+        x = tf.keras.layers.BatchNormalization(axis=1)(x)
         x = tf.keras.layers.LeakyReLU()(x)
 
         return (x)
@@ -61,13 +64,14 @@ class Res_CNN():
         filters = 1
         , kernel_size = (1,1)
         , padding = 'same'
+        , data_format="channels_first"
         , use_bias=False
         , activation='linear'
         , kernel_regularizer = tf.keras.regularizers.l2(self.reg_const)
         )(x)
 
 
-        x = tf.keras.layers.BatchNormalization(axis=3)(x)
+        x = tf.keras.layers.BatchNormalization(axis=1)(x)
         x = tf.keras.layers.LeakyReLU()(x)
 
         x = tf.keras.layers.Flatten()(x)
@@ -90,6 +94,7 @@ class Res_CNN():
         filters = 2
         , kernel_size = (1,1)
         , padding = 'same'
+        , data_format="channels_first"
         , use_bias=False
         , activation='linear'
         , kernel_regularizer = tf.keras.regularizers.l2(self.reg_const)
@@ -107,10 +112,10 @@ class Res_CNN():
         
     def build(self):
         # HWC - cpu doesn't support CHW
-        main_input = tf.keras.layers.Input(shape = (8,8,4), name = 'main_input')
-        x = self.conv_layer(main_input, 128, (3,3))
+        main_input = tf.keras.layers.Input(shape = (4, 8, 8), name = 'main_input')
+        x = self.conv_layer(main_input, 32, (3,3))
         for h in range(config.HIDDEN_LAYERS):
-            x = self.residual_layer(x, 128, (3,3))
+            x = self.residual_layer(x, 32, (3,3))
 
         vh = self.value_head(x)
         ph = self.policy_head(x)
@@ -134,7 +139,7 @@ class Res_CNN():
         Returns:
             Model input, which is always from perspective of current player.
         """
-        board = np.zeros((1, 8, 8, 4))
+        board = np.zeros((1, 4, 8, 8))
         check = state[0]|state[1]|state[2]|state[3]
         for i in range(32):
             tn = 1 << i
@@ -149,7 +154,7 @@ class Res_CNN():
                     index = self._map[index]
                 if (tn&check) != 0:
                     if (tn & state[idx]) == tn:
-                        board[0, x, y, index] = 1
+                        board[0, index, x, y] = 1
         return board
     
     def load_model(self, path):
