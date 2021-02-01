@@ -27,23 +27,19 @@ def self_play(player1, player2, iteration, memory=None, log_result=False, save_m
     player1: Agent used for self play and training
              You can switch which side/player player1 is by setting player field
     player2: other agent used for self play, can be RandomAgent
-    iteration (int): Iteration number, if > 0 will load iteration - 1 model
+    iteration (int): Iteration number
     memory: Used to store targets for training that are generated from self-play, set to None
             If you just want to test a model
     log_result (boolean): Will log result of games.
     """
-    if iteration > 0:
-        print('loading model...')
-        player1.load_model(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
-        player1.compile_model()
     result = run_matches(player1, player2, episodes, memory=memory, iteration=iteration)
-    if save_model:
-        player1.model.model.save(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
     if log_result:
         print(result)
     if memory is not None:
         memory.clear_stmemory()
         player1.replay(memory.ltmemory)
+    if save_model:
+        player1.model.model.save(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
 
 def main():
     """
