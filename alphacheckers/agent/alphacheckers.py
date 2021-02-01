@@ -1,6 +1,5 @@
 import alphacheckers.config.config as config
 import alphacheckers.game.game as game
-import alphacheckers.agent.model as model
 import numpy as np
 import pickle
 import random
@@ -22,6 +21,7 @@ class Node():
     def __init__(self, state):
         self.state = [*state]
         self.edges = []
+        self.ended = False
     def is_leaf(self):
         return len(self.edges) == 0
 
@@ -34,8 +34,8 @@ class Agent(object):
         self.player = 1
         self.root = Node(state)
         self.action_size = 32*8
-        self.cache = {}
-
+        self.nodes = {}
+        
     def select(self):
         current = self.root
         # stack of edges, makes backprop easier
@@ -48,7 +48,7 @@ class Agent(object):
                 x = config.x
                 alpha = np.random.dirichlet([config.ALPHA] * len(current.edges))
             else:
-                x = 0
+                x = 1
                 alpha = [0] * len(current.edges)
 
             Nb = 0
@@ -56,7 +56,7 @@ class Agent(object):
                 Nb += edge.N
             best_edge = current.edges[0]
             for idx, edge in enumerate(current.edges):
-                U = self.cpuct * (config.x * edge.P + (1-config.x) * alpha[idx]) * np.sqrt(Nb) / (1 + edge.N)
+                U = self.cpuct * (x * edge.P + (1-x) * alpha[idx]) * np.sqrt(Nb) / (1 + edge.N)
                 Q = edge.Q
                 if U + Q > max_QU:
                     max_QU = Q + U
@@ -86,29 +86,28 @@ class Agent(object):
         probs = probs[valid]
         mlist = game.get_moves(*node.state)
         if len(mlist) == 0:
-            return value[0]
+            node.ended = True
+            return -1
+        children = {}
         for idx, move_index in enumerate(valid):
             action = game.hard_index_to_move(move_index, mlist, node.state[4])
             new_state = game.run_move(*node.state, action)
-            new_node = Node(new_state)
+            key = game.get_state_key(*new_state)
+            if not key in children:
+                new_node = Node(new_state)
+                children[key] = new_node
+                if not key in self.nodes:
+                    self.nodes[key] = new_node
+            new_node = children[key]
             edge = Edge(node, new_node, probs[idx], action, move_index, node.state[4])
             node.edges.append(edge)
-        return value[0]
+        return value
 
     def get_preds(self, state):
-        # check cache first
-        key = game.get_state_key(*state)
-        output = None
-        if key in self.cache:
-            output = self.cache[key]
-        else:
-            state_input = self.model.convert_to_model_input(state)
-            output = self.model.predict(state_input)
-            self.cache[key] = output
-
-        value = output[0][0]
+        state_input = self.model.convert_to_model_input(state)
+        output = self.model.predict(state_input)
+        value = output[0][0][0]
         logits = output[1][0]
-
         mask, valid = game.get_moves_mask(state, state[4])
         mask = np.reshape(mask, logits.shape)
         mask = mask.reshape((256))
@@ -147,8 +146,11 @@ class Agent(object):
         game.pretty_print_move(act)
         raise Exception("could not find move")
 
-    def run(self, state, tau=0.5):
-        self.root = Node(state)
+    def run(self, state, tau=1):
+        key = game.get_state_key(*state)
+        if not key in self.nodes:
+            self.nodes[key] = Node(state)
+        self.root = self.nodes[key]
         for i in range(self.simulations):
             self.simulate()
         pi, values = self.get_action_values()
@@ -175,7 +177,7 @@ class Agent(object):
             training_states = np.array([self.model.convert_to_model_input(row['state'])[0] for row in minibatch])
             training_targets = {'value_head': np.array([row['value'] for row in minibatch])
                                 , 'policy_head': np.array([row['pi'] for row in minibatch])} 
-            fit = self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0, batch_size = config.BATCH_SIZE)
+            fit = self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0, batch_size = int(config.BATCH_SIZE/4))
             print('NEW LOSS %s', fit.history)
 
     def reset(self):
@@ -183,7 +185,6 @@ class Agent(object):
 
     def set_state(self, state):
         self.root = Node(state)
-
 
     def get_weights(self):
         return self.model.get_weights()
