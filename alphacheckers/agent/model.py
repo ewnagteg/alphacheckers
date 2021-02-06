@@ -76,7 +76,7 @@ class Res_CNN():
 
         x = tf.keras.layers.Flatten()(x)
 
-        x = tf.keras.layers.Dense(180, use_bias=False, activation='linear', kernel_regularizer=tf.keras.regularizers.l2(self.reg_const))(x)
+        x = tf.keras.layers.Dense(32, use_bias=False, activation='linear', kernel_regularizer=tf.keras.regularizers.l2(self.reg_const))(x)
 
         x = tf.keras.layers.LeakyReLU()(x)
 
@@ -111,7 +111,7 @@ class Res_CNN():
         return (x)
         
     def build(self):
-        # HWC - cpu doesn't support CHW
+        # NCHW
         main_input = tf.keras.layers.Input(shape = (4, 8, 8), name = 'main_input')
         x = self.conv_layer(main_input, 32, (3,3))
         for h in range(config.HIDDEN_LAYERS):
