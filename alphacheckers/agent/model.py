@@ -121,9 +121,10 @@ class Res_CNN():
         ph = self.policy_head(x)
         model = tf.keras.Model(inputs=[main_input], outputs=[vh, ph])
         model.compile(loss={'value_head': 'mean_squared_error', 'policy_head': softmax_cross_entropy_with_logits},
-            optimizer=tf.keras.optimizers.SGD(lr=self.learning_rate, momentum = config.MOMENTUM),    
+            optimizer = tf.keras.optimizers.SGD(learning_rate=self.learning_rate, momentum=config.MOMENTUM)),    
             loss_weights={'value_head': 0.5, 'policy_head': 0.5}    
             )
+        
         return model
         
     def predict(self, x):
