@@ -39,7 +39,7 @@ def self_play(player1, player2, iteration, memory=None, log_result=False, save_m
         memory.clear_stmemory()
         player1.replay(memory.ltmemory)
     if save_model:
-        player1.model.model.save(config.MODELS_DIR + 'model-{}.ckpt'.format(iteration))
+        player1.model.model.save(config.MODELS_DIR + 'model-{}.keras'.format(iteration))
 
 def main():
     """
