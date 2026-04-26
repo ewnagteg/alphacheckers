@@ -168,7 +168,7 @@ class Agent(object):
         log = open(config.MODELS_DIR + "ltmemory_dump_{}.pkl".format(iteration), "wb")
         pickle.dump(ltmemory, log)
         log.close()
-        print('saved ltmemory')
+        # print('saved ltmemory')
         # to load
         # log = open("ltmemory_dump_0.pkl", "rb") 
         # ltmemory = pickle.load(log)
@@ -177,8 +177,8 @@ class Agent(object):
             training_states = np.array([self.model.convert_to_model_input(row['state'])[0] for row in minibatch])
             training_targets = {'value_head': np.array([row['value'] for row in minibatch])
                                 , 'policy_head': np.array([row['pi'] for row in minibatch])} 
-            fit = self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=1, validation_split=0, batch_size = int(config.BATCH_SIZE/4))
-            print('NEW LOSS %s', fit.history)
+            fit = self.model.fit(training_states, training_targets, epochs=config.EPOCHS, verbose=0, validation_split=0, batch_size = int(config.BATCH_SIZE/4))
+            # print('NEW LOSS %s', fit.history)
 
     def reset(self):
         self.root = None
