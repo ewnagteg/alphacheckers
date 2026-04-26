@@ -16,11 +16,9 @@ class Memory:
             })
 
     def commit_ltmemory(self):
-        print('committing ltmemory')
         for i in self.stmemory:
             self.ltmemory.append(i)
         self.clear_stmemory()
-        print('ltmemory size now: {}'.format(len(self.ltmemory)))
 
     def clear_stmemory(self):
         self.stmemory = deque(maxlen=config.MEMORY_SIZE)
