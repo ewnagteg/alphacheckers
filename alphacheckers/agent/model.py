@@ -104,7 +104,7 @@ class Res_CNN():
         x = tf.keras.layers.LeakyReLU()(x)
         x = tf.keras.layers.Flatten()(x)
         x = tf.keras.layers.Dense(32*8, 
-                                activation='softmax', 
+                                activation='linear', 
                                 use_bias=False, 
                                 kernel_regularizer=tf.keras.regularizers.l2(self.reg_const),
                                 name='policy_head')(x)
